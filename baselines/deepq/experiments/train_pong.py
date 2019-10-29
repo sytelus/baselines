@@ -2,7 +2,7 @@ from baselines import deepq
 from baselines import bench
 from baselines import logger
 from baselines.common.atari_wrappers import make_atari
-
+from baselines.deepq import defaults
 
 def main():
     exp_dir = './runs/pong'
@@ -18,23 +18,20 @@ def main():
     env = bench.Monitor(env, logger.get_dir())
     env = deepq.wrap_atari_dqn(env)
 
+    learn_params = defaults.atari()
+    learn_params['checkpoint_path'] = exp_dir
+    learn_params['checkpoint_freq'] = 100000 
+    learn_params['print_freq'] = 10
+
     model = deepq.learn(
         env,
-        "conv_only",
-        convs=[(32, 8, 4), (64, 4, 2), (64, 3, 1)],
-        hiddens=[256],
-        dueling=True,
-        lr=1e-4,
+
+        # below are defaults
+        #convs=[(32, 8, 4), (64, 4, 2), (64, 3, 1)],
+        #hiddens=[256],
+
         total_timesteps=int(1e7),
-        buffer_size=10000,
-        exploration_fraction=0.1,
-        exploration_final_eps=0.01,
-        train_freq=4,
-        learning_starts=10000,
-        target_network_update_freq=1000,
-        gamma=0.99,
-        checkpoint_path=exp_dir,
-        checkpoint_freq=100000
+        **learn_params
     )
 
     model.save('pong_model.pkl')
