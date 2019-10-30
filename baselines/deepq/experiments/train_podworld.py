@@ -3,7 +3,7 @@ from baselines import bench
 from baselines import logger
 from baselines.deepq import defaults
 from baselines.common.atari_wrappers import ClipRewardEnv, FrameStack
-
+from baselines.common.schedules import LinearSchedule, PiecewiseSchedule
 
 import gym
 from podworld.envs import PodWorldEnv # import is needed to exec regiter in init
@@ -34,12 +34,15 @@ def main():
     # by default monitor will log episod reward and log
     env = bench.Monitor(env, logger.get_dir())
 
-    learn_params = defaults.atari()
+    learn_params = defaults.atari_breakout()
     learn_params['checkpoint_path'] = exp_dir
     learn_params['checkpoint_freq'] = 100000 
     learn_params['print_freq'] = 10
-    # learn_params['convs']=[(32, 8, 4), (64, 4, 2), (64, 3, 1)],
-    # learn_params['hiddens']=[256],    
+    learn_params['exploration_scheduler'] = PiecewiseSchedule([ \
+                (0,        1.0),
+                (int(1e6), 0.1),
+                (int(1e7), 0.01)
+            ], outside_value=0.01) 
 
     model = deepq.learn(
         env,

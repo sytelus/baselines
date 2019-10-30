@@ -26,7 +26,7 @@ def main():
     env = bench.Monitor(env, logger.get_dir())
     env = deepq.wrap_atari_dqn(env)
 
-    learn_params = defaults.atari()
+    learn_params = defaults.atari_breakout()
     learn_params['checkpoint_path'] = exp_dir
     learn_params['checkpoint_freq'] = 100000 
     learn_params['print_freq'] = 10
