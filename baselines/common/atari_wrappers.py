@@ -175,6 +175,7 @@ class WarpFrame(gym.ObservationWrapper):
             frame, (self._width, self._height), interpolation=cv2.INTER_AREA
         )
         if self._grayscale:
+            # adds trailing 1 in shape so frame is now wxhxcx1
             frame = np.expand_dims(frame, -1)
 
         if self._key is None:
