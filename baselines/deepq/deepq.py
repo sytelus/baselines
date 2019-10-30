@@ -100,6 +100,7 @@ def learn(env,
           buffer_size=50000,
           exploration_fraction=0.1,
           exploration_final_eps=0.02,
+          exploration_scheduler = None,
           train_freq=1,
           batch_size=32,
           print_freq=100,
@@ -228,7 +229,7 @@ def learn(env,
         replay_buffer = ReplayBuffer(buffer_size)
         beta_schedule = None
     # Create the schedule for exploration starting from 1.
-    exploration = LinearSchedule(schedule_timesteps=int(exploration_fraction * total_timesteps),
+    exploration = exploration_scheduler or LinearSchedule(schedule_timesteps=int(exploration_fraction * total_timesteps),
                                  initial_p=1.0,
                                  final_p=exploration_final_eps)
 

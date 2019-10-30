@@ -1,11 +1,16 @@
 from baselines import deepq
 from baselines import bench
 from baselines import logger
-from baselines.common.atari_wrappers import make_atari
+from baselines.common.atari_wrappers import make_atari, FrameStack
 from baselines.deepq import defaults
+from baselines.common.schedules import LinearSchedule, PiecewiseSchedule
 
 
-
+# - agent sees 3rd and 4th frames
+# - greyscale
+# - reward clipping/huber loss
+# - learning rate needs to be lower for more complex games
+# - tf.variance_scaling_initializer with scale=2
 
 def main():
     exp_dir = './runs/breakout'
@@ -25,6 +30,11 @@ def main():
     learn_params['checkpoint_path'] = exp_dir
     learn_params['checkpoint_freq'] = 100000 
     learn_params['print_freq'] = 10
+    learn_params['exploration_scheduler'] = PiecewiseSchedule([ \
+                (0,        1.0),
+                (int(1e6), 0.1),
+                (int(1e7), 0.01)
+            ], outside_value=0.01)
 
     model = deepq.learn(
         env,
@@ -33,7 +43,7 @@ def main():
         #convs=[(32, 8, 4), (64, 4, 2), (64, 3, 1)],
         #hiddens=[256],
 
-        total_timesteps=int(1e7),
+        total_timesteps=int(3e7),
         **learn_params
     )
 
